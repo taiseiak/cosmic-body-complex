@@ -5,9 +5,6 @@ local LoadText = require("loadText")
 
 local InputManager = require("input-manager")
 
-local TestScene = require("test-scene")
-local LungeScene = require("lunge-scene")
-
 -- [Globals] --
 if setupGlobals then G = setupGlobals() end
 if LoadText then LoadText() end
@@ -34,16 +31,13 @@ function love.load()
     inputManager = InputManager:getInstance()
 
     startTime = love.timer.getTime()
-
-    -- [scenes] --
-    -- testScene = TestScene.new()
-    G.scenes.lunge = LungeScene.new()
 end
 
 function love.update(dt)
     G_currentTime = love.timer.getTime() - startTime
 
     inputManager:update()
+
     G.scenery:update(dt)
 end
 

@@ -13,6 +13,7 @@ local function new()
             a = { 'key:a' },
             s = { 'key:s' },
             d = { 'key:d' },
+            leftMouse = { 'mouse:1' }
         }
     })
     return self
