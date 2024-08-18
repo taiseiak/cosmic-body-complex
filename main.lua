@@ -12,7 +12,7 @@ local palette = {
 
 G_gameWidth, G_gameHeight = 1280, 720
 G_currentTime = 0
-G_currentScene = "lunge"
+G_currentScene = "testScene"
 G_scenes = {}
 
 -- [Locals] --
@@ -36,7 +36,7 @@ function love.load()
     startTime = love.timer.getTime()
 
     -- [scenes] --
-    testScene = TestScene.new()
+    G_scenes.testScene = TestScene.new()
     G_scenes.lunge = LungeScene.new()
 end
 
