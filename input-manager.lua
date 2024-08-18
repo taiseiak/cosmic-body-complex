@@ -7,7 +7,9 @@ function InputManager:init()
     self.input = Baton.new({
         controls = {
             lift = { 'key:w' },
-            lower = { 'key:s' }
+            lower = { 'key:s' },
+            right = { 'key:d'},
+            left = { 'key:a'}
         }
     })
 end
