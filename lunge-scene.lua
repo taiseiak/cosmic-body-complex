@@ -60,6 +60,10 @@ function LungeScene.new()
 end
 
 function LungeScene:update(dt)
+    if self.controls:down("leftLegForward") then
+        print(self.leftLegEffort)
+        self.leftLegEffort = math.min(1, self.leftLegEffort + dt)
+    end
 end
 
 function LungeScene:draw()
