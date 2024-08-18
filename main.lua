@@ -1,7 +1,5 @@
 local Push = require("libraries.push")
-
 local InputManager = require("input-manager")
-
 local TestScene = require("test-scene")
 local LungeScene = require("lunge-scene")
 
@@ -12,7 +10,7 @@ local palette = {
     { 224 / 255, 219 / 255, 205 / 255 }, -- #e0dbcd
 }
 
-G_gameWidth, G_gameHeight = 320, 180
+G_gameWidth, G_gameHeight = 1280, 720
 G_currentTime = 0
 G_currentScene = "lunge"
 G_scenes = {}
@@ -21,7 +19,9 @@ G_scenes = {}
 local startTime
 local testScene
 
+
 function love.load()
+
     love.graphics.setDefaultFilter('nearest', 'nearest')
     Push:setupScreen(G_gameWidth, G_gameHeight, 1280, 720,
         {
