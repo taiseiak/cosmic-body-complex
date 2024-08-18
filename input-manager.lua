@@ -6,10 +6,10 @@ InputManager.__index = InputManager
 function InputManager:init()
     self.input = Baton.new({
         controls = {
-            lift = { 'key:w' },
-            lower = { 'key:s' },
-            right = { 'key:d'},
-            left = { 'key:a'}
+            w = { 'key:w' },
+            a = { 'key:a' },
+            s = { 'key:s' },
+            d = { 'key:d' },
         }
     })
 end
