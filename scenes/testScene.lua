@@ -83,7 +83,7 @@ function game:CreateEnemies(size, enemyCount, enemyStartPosMultiplier)
     return Enemies
 end
 
-function game:createBullets()
+function game:createPlayerBullets()
     local mx, my = self:getPlayerCenter()
     local bulletAngle = getMouseAngle(mx, my)
 
@@ -115,7 +115,7 @@ function game:EnemyCollision(num, e1, e2)
     end
 end
 
-function game:BulletCheck()
+function game:PlayerBulletCheck()
     for i, v in ipairs(bullets) do
         -- enemy collision check
         for d, c in ipairs(self.Enemies) do
@@ -186,7 +186,7 @@ function game:update(dt)
 
         -- create bullets
         if self.inputManager:pressed("leftMouse") then
-            self:createBullets()
+            self:createPlayerBullets()
         end
 
         -- bullets movement
@@ -196,7 +196,7 @@ function game:update(dt)
         end
 
         -- remove enemy and excess bullets
-        self:BulletCheck()
+        self:PlayerBulletCheck()
     else
         local x, y = love.mouse.getPosition()
         if self.inputManager:pressed("leftMouse") then
