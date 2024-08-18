@@ -1,13 +1,10 @@
 local Baton = require("libraries.baton")
 local Vector = require("libraries.brinevector")
 
-local InputManager = require('input-manager')
+local game = {}
 
-local LungeScene = {}
-LungeScene.__index = LungeScene
-
-function LungeScene.new()
-    local self = {
+function game:load(args)
+    self = {
         controls         = Baton.new({
             controls = {
                 leftLegForward = { 'key:q' },
@@ -55,18 +52,16 @@ function LungeScene.new()
         leftLegEffort    = 0,
         rightLegEffort   = 0,
     }
-    setmetatable(self, LungeScene)
-    return self
 end
 
-function LungeScene:update(dt)
+function game:update(dt)
     if self.controls:down("leftLegForward") then
         print(self.leftLegEffort)
         self.leftLegEffort = math.min(1, self.leftLegEffort + dt)
     end
 end
 
-function LungeScene:draw()
+function game:draw()
     love.graphics.push()
     love.graphics.translate(160, 80)
     love.graphics.draw(
@@ -112,4 +107,4 @@ function LungeScene:draw()
     love.graphics.pop()
 end
 
-return LungeScene
+return game

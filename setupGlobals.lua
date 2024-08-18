@@ -12,7 +12,9 @@ local function setupGlobals()
         { 168 / 255, 159 / 255, 148 / 255 }, -- #a89f94
         { 224 / 255, 219 / 255, 205 / 255 }, -- #e0dbcd
     }
-    g.scenery = Scenery("mainMenu")
+    -- This is the default scene.
+    -- Change the string to change the default scene.
+    g.scenery = Scenery("testScene")
     return g
 end
 
