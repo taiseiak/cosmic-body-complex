@@ -7,11 +7,11 @@ local bullets = {}
 
 -- x1,y1 are further out point
 -- x2,y2 are center point
-local function getAngle(x1, y1, x2, y2)
-    local dx = x1 - x2
-    local dy = -(y1 - y2)
+local function getMouseAngle(x, y)
+    local mouseX = love.mouse.getX()
+    local mouseY = love.mouse.getY()
 
-    local angle = math.atan2(dx, dy)
+    local angle = math.atan2((mouseY - y), (mouseX - x))
 
     return angle
 end
@@ -26,8 +26,8 @@ end
 function CreatePlayer()
     local Player = {}
 
-    Player.x = 10
-    Player.y = 130
+    Player.x = G.gameWidth/2
+    Player.y = G.gameHeight/2
     Player.size = 10
     Player.health = 3
 
@@ -42,7 +42,8 @@ function CreateAim(Player)
     Aim.width = Aim.sprite:getWidth()
     Aim.height = Aim.sprite:getHeight()
 
-    Aim.x, Aim.y = Player.x + (Player.size / 2), Player.y + (Player.size / 2)
+    Aim.x = Player.x + (Player.size / 2)
+    Aim.y = Player.y + (Player.size / 2)
 
     Aim.rotation = math.rad(0)
 
@@ -52,20 +53,34 @@ function CreateAim(Player)
     Aim.originX = Player.x + (Player.size / 2)
     Aim.originY = Player.y + (Player.size / 2)
 
+    Aim.angle = 0
+
     return Aim
 end
 
 function CreateEnemies()
     local Enemies = {}
+    local enemiesSize = 10
+    local minEnemies, maxEnemies = 0, 0
+    local enemyStartPosMultiplier = 2
 
     -- random enemy count
-    local enemyCount = love.math.random(3, 7)
+    local enemyCount = love.math.random(minEnemies, maxEnemies)
 
     for num = 1, enemyCount do
         -- random enemy position
-        local x, y = love.math.random(G.gameWidth), love.math.random(G.gameHeight)
+        local x, y = love.math.random(0,G.gameWidth) * enemyStartPosMultiplier, love.math.random(0,G.gameHeight) * enemyStartPosMultiplier
 
-        table.insert(Enemies, { x = x, y = y, size = 10 })
+        -- random negative
+        local neg = love.math.random(1,4)
+        print(neg)
+        if neg == 1 then
+            x = x * -1
+        elseif neg == 2 then
+            y = y * -1
+        end
+
+        table.insert(Enemies, { x = x, y = y, size = enemiesSize })
     end
 
     return Enemies
@@ -133,26 +148,24 @@ function game:update(dt)
 
     if self.inputManager:pressed("leftMouse") then
         -- shooting
-        local startX = self.Player.x + self.Player.size / 2
-        local startY = self.Player.y + self.Player.size / 2
+        local x = self.Player.x + self.Player.size / 2
+        local y = self.Player.y + self.Player.size / 2
 
-        local mouseX = love.mouse.getX()
-        local mouseY = love.mouse.getY()
-
-        local bulletAngle = math.atan2((mouseY - startY), (mouseX - startX))
+        local bulletAngle = getMouseAngle(x, y)
 
         local dx = math.cos(bulletAngle) * self.bulletSpeed
         local dy = math.sin(bulletAngle) * self.bulletSpeed
 
-        table.insert(bullets, { x = startX, y = startY, dx = dx, dy = dy })
+        table.insert(bullets, { x = x, y = y, dx = dx, dy = dy })
     end
 
     if self.Player.health > 0 then
         -- aim rotation
-        self.angle = getAngle(love.mouse.getX(), love.mouse.getY(), self.Aim.x, self.Aim.y)
+        self.Aim.angle = getMouseAngle(self.Aim.x, self.Aim.y)
 
         -- aim following player
-        self.Aim.x, self.Aim.y = self.Player.x + (self.Player.size / 2), self.Player.y + (self.Player.size / 2)
+        --self.Aim.x, self.Aim.y = self.Player.x + (self.Player.size / 2), self.Player.y + (self.Player.size / 2)
+        --self.Aim.originX, self.Aim.originY = self.Player.x + (self.Player.size / 2), self.Player.y + (self.Player.size / 2)
 
 
         -- bullets movement
@@ -182,8 +195,8 @@ end
 
 function game:draw()
     -- self.aim reticle
-    love.graphics.draw(self.Aim.sprite, self.Aim.x, self.Aim.y, self.angle, self.Aim.scaleX, self.Aim.scaleY, self.Aim
-        .originX, self.Aim.originY)
+    love.graphics.draw(self.Aim.sprite, self.Aim.x, self.Aim.y, self.Aim.angle, self.Aim.scaleX, self.Aim.scaleY, 
+        self.Aim.originX, self.Aim.originY)
 
     -- player
     love.graphics.rectangle("fill", self.Player.x, self.Player.y, self.Player.size, self.Player.size)
