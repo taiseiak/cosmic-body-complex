@@ -27,18 +27,18 @@ function game:getPlayerCenter()
     return self.Player.x + (self.Player.size / 2), self.Player.y + (self.Player.size / 2)
 end
 
-function game:CreatePlayer()
+function game:CreatePlayer(x, y, size, health)
     local Player = {}
 
-    Player.x = 0
-    Player.y = 0
-    Player.size = 10
-    Player.health = 3
+    Player.x = x
+    Player.y = y
+    Player.size = size
+    Player.health = health
 
     return Player
 end
 
-function game:CreateAim()
+function game:CreateAim(scale, reticleDistance)
     local Aim = {}
 
     Aim.sprite = love.graphics.newImage("Aim.png")
@@ -48,26 +48,23 @@ function game:CreateAim()
 
     Aim.x, Aim.y = self:getPlayerCenter()
 
-    Aim.scaleX = 0.5
-    Aim.scaleY = 0.5
+    Aim.scaleX = scale
+    Aim.scaleY = scale
 
+    -- center of image offset
     Aim.originOffsetX = Aim.width * 0.5
     Aim.originOffsetY = Aim.height * 0.5
 
-    Aim.reticleDistance = 20
+    Aim.reticleDistance = reticleDistance
 
     return Aim
 end
 
-function game:CreateEnemies()
+function game:CreateEnemies(size, enemyCount, enemyStartPosMultiplier)
     local Enemies = {}
-    local enemiesSize = 10
-    local minEnemies, maxEnemies = 0, 0
-    local enemyStartPosMultiplier = 2
-
-    -- random enemy count
-    local enemyCount = love.math.random(minEnemies, maxEnemies)
-
+    local enemiesSize = size
+    local enemyStartPosMultiplier = enemyStartPosMultiplier
+    
     for num = 1, enemyCount do
         -- random enemy position
         local ranx, rany = love.math.random(0,G.gameWidth) * enemyStartPosMultiplier, love.math.random(0,G.gameHeight) * enemyStartPosMultiplier
@@ -87,10 +84,7 @@ function game:CreateEnemies()
 end
 
 function game:createBullets()
-    local mx = self.Player.x + self.Player.size / 2
-    local my = self.Player.y + self.Player.size / 2
     local mx, my = self:getPlayerCenter()
-
     local bulletAngle = getMouseAngle(mx, my)
 
     local dx = math.cos(bulletAngle) * self.bulletSpeed
@@ -144,11 +138,22 @@ function game:load(args)
     self.enemySpeed = 1
 
     self.font = love.graphics.newFont(100)
-    self.gameOverText = love.graphics.newText(self.font, "Game Over")
+    self.gameOverTextDrawable = love.graphics.newText(self.font, "Game Over")
+    self.gameOverText = {}
+    self.gameOverText.x = 300
+    self.gameOverText.y = 300
+    self.gameOverText.size = 100
 
-    self.Enemies = self:CreateEnemies()
-    self.Player = self:CreatePlayer()
-    self.Aim = self:CreateAim()
+    self.retryTextDrawable = love.graphics.newText(love.graphics.newFont(50), "Retry")
+    self.retryText = {}
+    self.retryText.x = 500
+    self.retryText.y = 500
+    self.retryText.size = 50
+
+    self.Player = self:CreatePlayer(G.gameWidth/2, G.gameHeight/2, 10, 3) -- x, y, size, health
+    self.Aim = self:CreateAim(0.5, 20) -- scale, reticleDistance
+    self.Enemies = self:CreateEnemies(10, 10, 2) -- size, enemyCount, enemyStartPosMultiplier (recommend 2)
+
     self.inputManager = InputManager:getInstance()
 end
 
@@ -170,8 +175,7 @@ function game:update(dt)
         
 
         -- aim angle
-        local mx = self.Player.x + (self.Player.size / 2)
-        local my = self.Player.y + (self.Player.size / 2)
+        local mx, my = self:getPlayerCenter()
         self.Aim.angle = (getMouseAngle(mx, my))
 
         -- aim following player
@@ -193,6 +197,15 @@ function game:update(dt)
 
         -- remove enemy and excess bullets
         self:BulletCheck()
+    else
+        local x, y = love.mouse.getPosition()
+        if self.inputManager:pressed("leftMouse") then
+            -- retry button
+            if x > self.retryText.x and x < self.retryText.x * self.retryText.size and 
+                y > self.retryText.y and y < self.retryText.y * self.retryText.size then
+                    self:load()
+            end
+        end
     end
 
     -- enemies
@@ -212,7 +225,9 @@ function game:draw()
 
     -- game over text
     if self.Player.health < 1 then
-        love.graphics.draw(self.gameOverText, 300, 300)
+        love.graphics.draw(self.gameOverTextDrawable, self.gameOverText.x, self.gameOverText.y)
+
+        love.graphics.draw(self.retryTextDrawable, self.retryText.x, self.retryText.y)
     end
 
     -- enemy
