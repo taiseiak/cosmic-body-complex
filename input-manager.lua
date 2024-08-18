@@ -3,7 +3,10 @@ local Baton = require("libraries.baton")
 local InputManager = {}
 InputManager.__index = InputManager
 
-function InputManager:init()
+local instance = nil
+
+local function new()
+    local self = setmetatable({}, InputManager)
     self.input = Baton.new({
         controls = {
             w = { 'key:w' },
@@ -12,6 +15,14 @@ function InputManager:init()
             d = { 'key:d' },
         }
     })
+    return self
+end
+
+function InputManager:getInstance()
+    if not instance then
+        instance = new()
+    end
+    return instance
 end
 
 function InputManager:update(dt)
