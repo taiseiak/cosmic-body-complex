@@ -1,9 +1,12 @@
+local utilities = require("utilities")
+
 function CreatePlayer()
     local Player = {}
 
     Player.x = 10
     Player.y = 130
     Player.size = 10
+    Player.health = 3
 
     return Player
 end
@@ -29,7 +32,45 @@ function createAim()
     return Aim
 end
 
-function BulletCheck()
+function CreateEnemies()
+    local Enemies = {}
+
+    -- random enemy count
+    local enemyCount = love.math.random(3, 7)
+
+    for num = 1, enemyCount do
+        -- random enemy position
+        local x, y = love.math.random(G_gameWidth), love.math.random(G_gameHeight)
+        
+        table.insert(Enemies, {x=x, y=y, size=10})
+    end
+
+    return Enemies
+end
+
+function EnemyMove(v)
+    local distX =  Player.x - v.x
+    local distY =  Player.y - v.y
+
+    local distance = math.sqrt(distX*distX+distY*distY)
+
+    local velocityX = distX / distance
+    local velocityY = distY / distance
+
+    v.x = v.x + velocityX * enemySpeed
+    v.y = v.y + velocityY * enemySpeed
+
+    return v.x, v.y
+ end
+
+ function EnemyCollision(num, e1, e2)
+    if CheckCollision(e1.x,e1.y,e1.size,e1.size, e2.x,e2.y,e2.size,e2.size) == true then
+        table.remove(Enemies, num)
+        Player.health = Player.health - 1
+    end
+ end
+
+ function BulletCheck()
     for i, v in ipairs(bullets) do
         -- enemy collision check
         for d, c in ipairs(Enemies) do
@@ -45,34 +86,3 @@ function BulletCheck()
         end
     end
 end
-
-function CreateEnemies()
-    local Enemies = {}
-
-    -- random enemy count
-    local enemyCount = love.math.random(3, 7)
-
-    for num = 1, enemyCount do
-        -- random enemy position
-        local x, y = love.math.random(G_gameWidth), love.math.random(G_gameHeight)
-        
-        table.insert(Enemies, {x=x, y=y})
-    end
-
-    return Enemies
-end
-
-function EnemyMove()
-    for i,v in ipairs(Enemies) do
-        local distX =  Player.x - v.x
-        local distY =  Player.y - v.y
-
-        local distance = math.sqrt(distX*distX+distY*distY)
-
-        local velocityX = distX / distance
-        local velocityY = distY / distance
-
-        v.x = v.x + velocityX * enemySpeed
-        v.y = v.y + velocityY * enemySpeed
-    end
- end
