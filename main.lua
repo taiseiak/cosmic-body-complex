@@ -3,6 +3,7 @@ local Push = require("libraries.push")
 local InputManager = require("input-manager")
 
 local TestScene = require("test-scene")
+local LungeScene = require("lunge-scene")
 
 local palette = {
     { 43 / 255,  43 / 255,  38 / 255 },  -- #2b2b26
@@ -13,7 +14,7 @@ local palette = {
 
 G_gameWidth, G_gameHeight = 320, 180
 G_currentTime = 0
-G_currentScene = "test"
+G_currentScene = "lunge"
 G_scenes = {}
 
 -- [Locals] --
@@ -36,6 +37,7 @@ function love.load()
 
     -- [scenes] --
     testScene = TestScene.new()
+    G_scenes.lunge = LungeScene.new()
 end
 
 function love.update(dt)
@@ -43,17 +45,13 @@ function love.update(dt)
 
     InputManager:update()
 
-    if G_currentScene == "test" then
-        testScene.update(dt)
-    end
+    G_scenes[G_currentScene]:update(dt)
 end
 
 function love.draw()
     love.graphics.clear(palette[2])
     Push:apply("start")
     love.graphics.clear(palette[1])
-    if G_currentScene == "test" then
-        testScene.draw()
-    end
+    G_scenes[G_currentScene]:draw()
     Push:apply("end")
 end
