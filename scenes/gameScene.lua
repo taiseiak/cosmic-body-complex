@@ -38,30 +38,30 @@ function game:createPlayer(x, y, size, health)
     return player
 end
 
-function game:CreateAim(scale, reticleDistance)
-    local Aim = {}
+function game:createAim(scale, reticleDistance)
+    local aim = {}
 
-    Aim.sprite = love.graphics.newImage("Aim.png")
+    aim.sprite = love.graphics.newImage("Aim.png")
 
-    Aim.width = Aim.sprite:getWidth()
-    Aim.height = Aim.sprite:getHeight()
+    aim.width = aim.sprite:getWidth()
+    aim.height = aim.sprite:getHeight()
 
-    Aim.x, Aim.y = self:getPlayerCenter()
+    aim.x, aim.y = self:getPlayerCenter()
 
-    Aim.scaleX = scale
-    Aim.scaleY = scale
+    aim.scaleX = scale
+    aim.scaleY = scale
 
     -- center of image offset
-    Aim.originOffsetX = Aim.width * 0.5
-    Aim.originOffsetY = Aim.height * 0.5
+    aim.originOffsetX = aim.width * 0.5
+    aim.originOffsetY = aim.height * 0.5
 
-    Aim.reticleDistance = reticleDistance
+    aim.reticleDistance = reticleDistance
 
-    return Aim
+    return aim
 end
 
-function game:CreateEnemies(size, enemyCount, enemyStartPosMultiplier)
-    local Enemies = {}
+function game:createEnemies(size, enemyCount, enemyStartPosMultiplier)
+    local enemies = {}
     local enemiesSize = size
     local enemyStartPosMultiplier = enemyStartPosMultiplier
 
@@ -78,10 +78,10 @@ function game:CreateEnemies(size, enemyCount, enemyStartPosMultiplier)
             rany = rany * -1
         end
 
-        table.insert(Enemies, { x = ranx, y = rany, size = enemiesSize })
+        table.insert(enemies, { x = ranx, y = rany, size = enemiesSize })
     end
 
-    return Enemies
+    return enemies
 end
 
 function game:createPlayerBullets()
@@ -111,7 +111,7 @@ end
 
 function game:EnemyCollision(num, e1, e2)
     if CheckCollision(e1.x, e1.y, e1.size, e1.size, e2.x, e2.y, e2.size, e2.size) == true then
-        table.remove(self.Enemies, num)
+        table.remove(self.enemies, num)
         self.player.health = self.player.health - 1
     end
 end
@@ -119,9 +119,9 @@ end
 function game:PlayerBulletCheck()
     for i, v in ipairs(bullets) do
         -- enemy collision check
-        for d, c in ipairs(self.Enemies) do
+        for d, c in ipairs(self.enemies) do
             if CheckCollision(v.x, v.y, self.bulletSize, self.bulletSize, c.x, c.y, 10, 10) == true then
-                table.remove(self.Enemies, d)
+                table.remove(self.enemies, d)
                 table.remove(bullets, i)
             end
         end
@@ -152,8 +152,8 @@ function game:load(args)
     self.retryText.size = 50
 
     self.player = self:createPlayer(G.gameWidth / 2, G.gameHeight / 2, 10, 3) -- x, y, size, health
-    self.Aim = self:CreateAim(0.5, 20)                                        -- scale, reticleDistance
-    self.Enemies = self:CreateEnemies(10, 10, 2)                              -- size, enemyCount, enemyStartPosMultiplier (recommend 2)
+    self.aim = self:createAim(0.5, 20)                                        -- scale, reticleDistance
+    self.enemies = self:createEnemies(10, 10, 2)                              -- size, enemyCount, enemyStartPosMultiplier (recommend 2)
 
     self.inputManager = InputManager:getInstance()
 end
@@ -180,13 +180,13 @@ function game:update(dt)
 
         -- aim angle
         local mx, my = self:getPlayerCenter()
-        self.Aim.angle = (getMouseAngle(mx, my))
+        self.aim.angle = (getMouseAngle(mx, my))
 
         -- aim following player
-        local dx = math.cos(self.Aim.angle) * self.Aim.reticleDistance
-        local dy = math.sin(self.Aim.angle) * self.Aim.reticleDistance
-        self.Aim.x = mx + (dx)
-        self.Aim.y = my + (dy)
+        local dx = math.cos(self.aim.angle) * self.aim.reticleDistance
+        local dy = math.sin(self.aim.angle) * self.aim.reticleDistance
+        self.aim.x = mx + (dx)
+        self.aim.y = my + (dy)
 
         -- create bullets
         if self.inputManager:pressed("leftMouse") then
@@ -213,7 +213,7 @@ function game:update(dt)
     end
 
     -- enemies
-    for i, v in ipairs(self.Enemies) do
+    for i, v in ipairs(self.enemies) do
         v.x, v.y = self:EnemyMove(v)
         self:EnemyCollision(i, v, self.player)
     end
@@ -221,8 +221,8 @@ end
 
 function game:draw()
     -- self.aim reticle
-    love.graphics.draw(self.Aim.sprite, self.Aim.x, self.Aim.y, self.Aim.angle, self.Aim.scaleX, self.Aim.scaleY,
-        self.Aim.originOffsetX, self.Aim.originOffsetY)
+    love.graphics.draw(self.aim.sprite, self.aim.x, self.aim.y, self.aim.angle, self.aim.scaleX, self.aim.scaleY,
+        self.aim.originOffsetX, self.aim.originOffsetY)
 
     -- player
     love.graphics.rectangle("fill", self.player.x, self.player.y, self.player.size, self.player.size)
@@ -235,7 +235,7 @@ function game:draw()
     end
 
     -- enemy
-    for i, v in ipairs(self.Enemies) do
+    for i, v in ipairs(self.enemies) do
         love.graphics.setColor(255, 0, 0)
         love.graphics.rectangle("fill", v.x, v.y, v.size, v.size)
         love.graphics.setColor(255, 255, 255)
