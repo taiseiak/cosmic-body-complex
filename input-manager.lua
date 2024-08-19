@@ -9,12 +9,16 @@ local function new()
     local self = setmetatable({}, InputManager)
     self.input = Baton.new({
         controls = {
-            w = { 'key:w' },
-            a = { 'key:a' },
-            s = { 'key:s' },
-            d = { 'key:d' },
+            up = { 'key:w' },
+            left = { 'key:a' },
+            down = { 'key:s' },
+            right = { 'key:d' },
             leftMouse = { 'mouse:1' }
-        }
+        },
+        pairs = {
+            move = { 'left', 'right', 'up', 'down' }
+        },
+        joystick = love.joystick.getJoysticks()[1],
     })
     return self
 end

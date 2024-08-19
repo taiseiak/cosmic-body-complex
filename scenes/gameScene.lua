@@ -24,18 +24,18 @@ local function CheckCollision(x1, y1, w1, h1, x2, y2, w2, h2)
 end
 
 function game:getPlayerCenter()
-    return self.Player.x + (self.Player.size / 2), self.Player.y + (self.Player.size / 2)
+    return self.player.x + (self.player.size / 2), self.player.y + (self.player.size / 2)
 end
 
-function game:CreatePlayer(x, y, size, health)
-    local Player = {}
+function game:createPlayer(x, y, size, health)
+    local player = {}
 
-    Player.x = x
-    Player.y = y
-    Player.size = size
-    Player.health = health
+    player.x = x
+    player.y = y
+    player.size = size
+    player.health = health
 
-    return Player
+    return player
 end
 
 function game:CreateAim(scale, reticleDistance)
@@ -95,8 +95,8 @@ function game:createPlayerBullets()
 end
 
 function game:EnemyMove(v)
-    local distX = self.Player.x - v.x
-    local distY = self.Player.y - v.y
+    local distX = self.player.x - v.x
+    local distY = self.player.y - v.y
 
     local distance = math.sqrt(distX * distX + distY * distY)
 
@@ -112,7 +112,7 @@ end
 function game:EnemyCollision(num, e1, e2)
     if CheckCollision(e1.x, e1.y, e1.size, e1.size, e2.x, e2.y, e2.size, e2.size) == true then
         table.remove(self.Enemies, num)
-        self.Player.health = self.Player.health - 1
+        self.player.health = self.player.health - 1
     end
 end
 
@@ -151,7 +151,7 @@ function game:load(args)
     self.retryText.y = 500
     self.retryText.size = 50
 
-    self.Player = self:CreatePlayer(G.gameWidth / 2, G.gameHeight / 2, 10, 3) -- x, y, size, health
+    self.player = self:createPlayer(G.gameWidth / 2, G.gameHeight / 2, 10, 3) -- x, y, size, health
     self.Aim = self:CreateAim(0.5, 20)                                        -- scale, reticleDistance
     self.Enemies = self:CreateEnemies(10, 10, 2)                              -- size, enemyCount, enemyStartPosMultiplier (recommend 2)
 
@@ -159,20 +159,23 @@ function game:load(args)
 end
 
 function game:update(dt)
-    if self.Player.health > 0 then
+    if self.player.health > 0 then
         -- player movement
-        if self.inputManager:pressed("w") then
-            self.Player.y = self.Player.y - 10
-        end
-        if self.inputManager:pressed("s") then
-            self.Player.y = self.Player.y + 10
-        end
-        if self.inputManager:pressed("d") then
-            self.Player.x = self.Player.x + 10
-        end
-        if self.inputManager:pressed("a") then
-            self.Player.x = self.Player.x - 10
-        end
+        local x, y = self.inputManager.input:get('move')
+        self.player.x = self.player.x + x * dt * 100
+        self.player.y = self.player.y + y * dt * 100
+        -- if self.inputManager:pressed("w") then
+        --     self.player.y = self.player.y - 10
+        -- end
+        -- if self.inputManager:pressed("s") then
+        --     self.player.y = self.player.y + 10
+        -- end
+        -- if self.inputManager:pressed("d") then
+        --     self.player.x = self.player.x + 10
+        -- end
+        -- if self.inputManager:pressed("a") then
+        --     self.player.x = self.player.x - 10
+        -- end
 
 
         -- aim angle
@@ -212,7 +215,7 @@ function game:update(dt)
     -- enemies
     for i, v in ipairs(self.Enemies) do
         v.x, v.y = self:EnemyMove(v)
-        self:EnemyCollision(i, v, self.Player)
+        self:EnemyCollision(i, v, self.player)
     end
 end
 
@@ -222,10 +225,10 @@ function game:draw()
         self.Aim.originOffsetX, self.Aim.originOffsetY)
 
     -- player
-    love.graphics.rectangle("fill", self.Player.x, self.Player.y, self.Player.size, self.Player.size)
+    love.graphics.rectangle("fill", self.player.x, self.player.y, self.player.size, self.player.size)
 
     -- game over text
-    if self.Player.health < 1 then
+    if self.player.health < 1 then
         love.graphics.draw(self.gameOverTextDrawable, self.gameOverText.x, self.gameOverText.y)
 
         love.graphics.draw(self.retryTextDrawable, self.retryText.x, self.retryText.y)
