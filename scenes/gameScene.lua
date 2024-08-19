@@ -11,7 +11,7 @@ local function getMouseAngle(dx, dy)
     local mouseX = love.mouse.getX()
     local mouseY = love.mouse.getY()
 
-    local angle = math.atan2((mouseY - dy), (mouseX - dx))
+    local angle = math.atan((mouseY - dy), (mouseX - dx))
 
     return angle
 end

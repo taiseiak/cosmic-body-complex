@@ -42,7 +42,7 @@ function game:update(dt)
         and my <= self.startTextY + 10 + self.startText.get
         .height then
         if self.inputManager:pressed("leftMouse") then
-            self.setScene("testScene")
+            self.setScene("gameScene")
         end
     end
 end
