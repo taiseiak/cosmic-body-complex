@@ -1,4 +1,5 @@
 local Push = require("libraries.push")
+local Vector = require("libraries.brinevector")
 
 local InputManager = require('input-manager')
 
@@ -139,6 +140,32 @@ function game:PlayerBulletCheck()
     end
 end
 
+function game:findClosestEnemy()
+    if #self.enemies < 1 then return end
+    local closestEnemy = self.enemies[1]
+    local playerVector = Vector(self.player.x, self.player.y)
+    local closestDistance = (Vector(self.enemies[1].x, self.enemies[1].y) - playerVector).length2
+    for i = 2, #self.enemies, 1 do
+        local enemy = self.enemies[i]
+        local distanceVector = (Vector(enemy.x, enemy.y) - playerVector).length2
+        if distanceVector < closestDistance then
+            closestEnemy = enemy
+        end
+    end
+    return closestEnemy
+end
+
+function game:shootAt(x, y)
+    local playerPosition = Vector(self:getPlayerCenter())
+    local shootAtPosition = Vector(x, y)
+    local angle = (shootAtPosition - playerPosition).angle
+
+    local dx = math.cos(angle) * self.bulletSpeed
+    local dy = math.sin(angle) * self.bulletSpeed
+
+    table.insert(bullets, { x = playerPosition.x, y = playerPosition.y, dx = dx, dy = dy })
+end
+
 function game:load(args)
     self.bulletSize = 2
     self.bulletSpeed = 10
@@ -159,6 +186,8 @@ function game:load(args)
     self.player = self:createPlayer(G.gameWidth / 2, G.gameHeight / 2, 10, 3) -- x, y, size, health
     self.aim = self:createAim(0.5, 20)                                        -- scale, reticleDistance
     self.enemies = self:createEnemies(10, 10, 2)                              -- size, enemyCount, enemyStartPosMultiplier (recommend 2)
+
+    self.shootTimer = 0
 
     self.inputManager = InputManager:getInstance()
 end
@@ -221,6 +250,13 @@ function game:update(dt)
     for i, v in ipairs(self.enemies) do
         v.x, v.y = self:EnemyMove(v)
         -- self:EnemyCollision(i, v, self.player)
+    end
+
+    self.shootTimer = self.shootTimer + dt
+    local closestEnemy = self:findClosestEnemy()
+    if closestEnemy and self.shootTimer > 1.0 then
+        self:shootAt(closestEnemy.x, closestEnemy.y)
+        self.shootTimer = self.shootTimer - 1.0
     end
 end
 
