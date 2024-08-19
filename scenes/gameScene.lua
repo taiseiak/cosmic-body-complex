@@ -1,4 +1,7 @@
+local Push = require("libraries.push")
+
 local InputManager = require('input-manager')
+
 
 local game = {}
 
@@ -8,15 +11,16 @@ local bullets = {}
 -- x1,y1 are further out point
 -- x2,y2 are center point
 local function getMouseAngle(dx, dy)
-    local mouseX = love.mouse.getX()
-    local mouseY = love.mouse.getY()
+    local mx, my = Push:toGame(love.mouse.getPosition())
+    -- local mouseX = love.mouse.getX()
+    -- local mouseY = love.mouse.getY()
 
-    local angle = math.atan((mouseY - dy), (mouseX - dx))
+    local angle = math.atan2((my - dy), (mx - dx))
 
     return angle
 end
 
-local function CheckCollision(x1, y1, w1, h1, x2, y2, w2, h2)
+local function checkCollision(x1, y1, w1, h1, x2, y2, w2, h2)
     return x1 < x2 + w2 and
         x2 < x1 + w1 and
         y1 < y2 + h2 and
@@ -42,6 +46,8 @@ function game:createAim(scale, reticleDistance)
     local aim = {}
 
     aim.sprite = love.graphics.newImage("Aim.png")
+    -- Sets clear renering for pixel sprites
+    aim.sprite:setFilter('nearest', 'nearest')
 
     aim.width = aim.sprite:getWidth()
     aim.height = aim.sprite:getHeight()
@@ -110,7 +116,7 @@ function game:EnemyMove(v)
 end
 
 function game:EnemyCollision(num, e1, e2)
-    if CheckCollision(e1.x, e1.y, e1.size, e1.size, e2.x, e2.y, e2.size, e2.size) == true then
+    if checkCollision(e1.x, e1.y, e1.size, e1.size, e2.x, e2.y, e2.size, e2.size) == true then
         table.remove(self.enemies, num)
         self.player.health = self.player.health - 1
     end
@@ -120,7 +126,7 @@ function game:PlayerBulletCheck()
     for i, v in ipairs(bullets) do
         -- enemy collision check
         for d, c in ipairs(self.enemies) do
-            if CheckCollision(v.x, v.y, self.bulletSize, self.bulletSize, c.x, c.y, 10, 10) == true then
+            if checkCollision(v.x, v.y, self.bulletSize, self.bulletSize, c.x, c.y, 10, 10) == true then
                 table.remove(self.enemies, d)
                 table.remove(bullets, i)
             end
@@ -138,18 +144,17 @@ function game:load(args)
     self.bulletSpeed = 10
     self.enemySpeed = 1
 
-    self.font = love.graphics.newFont(100)
-    self.gameOverTextDrawable = love.graphics.newText(self.font, "Game Over")
+    self.gameOverTextDrawable = love.graphics.newText(Fonts.shinonomeBold, "Game Over")
     self.gameOverText = {}
-    self.gameOverText.x = 300
-    self.gameOverText.y = 300
-    self.gameOverText.size = 100
+    self.gameOverText.x = G.gameWidth / 2 - 30
+    self.gameOverText.y = G.gameHeight / 2 - 20
+    self.gameOverText.size = 5
 
-    self.retryTextDrawable = love.graphics.newText(love.graphics.newFont(50), "Retry")
+    self.retryTextDrawable = love.graphics.newText(Fonts.shinonome, "Retry")
     self.retryText = {}
-    self.retryText.x = 500
-    self.retryText.y = 500
-    self.retryText.size = 50
+    self.retryText.x = G.gameWidth / 2 - 20
+    self.retryText.y = G.gameHeight / 2 + 20
+    self.retryText.size = 3
 
     self.player = self:createPlayer(G.gameWidth / 2, G.gameHeight / 2, 10, 3) -- x, y, size, health
     self.aim = self:createAim(0.5, 20)                                        -- scale, reticleDistance
@@ -162,8 +167,8 @@ function game:update(dt)
     if self.player.health > 0 then
         -- player movement
         local x, y = self.inputManager.input:get('move')
-        self.player.x = self.player.x + x * dt * 100
-        self.player.y = self.player.y + y * dt * 100
+        self.player.x = self.player.x + x * dt * 150
+        self.player.y = self.player.y + y * dt * 150
         -- if self.inputManager:pressed("w") then
         --     self.player.y = self.player.y - 10
         -- end
@@ -202,7 +207,7 @@ function game:update(dt)
         -- remove enemy and excess bullets
         self:PlayerBulletCheck()
     else
-        local x, y = love.mouse.getPosition()
+        local x, y = Push:toGame(love.mouse.getPosition())
         if self.inputManager:pressed("leftMouse") then
             -- retry button
             if x > self.retryText.x and x < self.retryText.x * self.retryText.size and
@@ -215,11 +220,25 @@ function game:update(dt)
     -- enemies
     for i, v in ipairs(self.enemies) do
         v.x, v.y = self:EnemyMove(v)
-        self:EnemyCollision(i, v, self.player)
+        -- self:EnemyCollision(i, v, self.player)
     end
 end
 
 function game:draw()
+    -- Debug
+    if G.debug then
+        -- Mouse location
+        local mx, my = Push:toGame(love.mouse.getPosition())
+        love.graphics.setColor(1, 0, 0, 1)
+        love.graphics.circle("line", mx, my, 2)
+
+        -- Player location
+        love.graphics.setColor(0, 1, 0, 1)
+        local px, py = self:getPlayerCenter()
+        love.graphics.circle("line", px, py, 10)
+
+        love.graphics.setColor(1, 1, 1, 1)
+    end
     -- self.aim reticle
     love.graphics.draw(self.aim.sprite, self.aim.x, self.aim.y, self.aim.angle, self.aim.scaleX, self.aim.scaleY,
         self.aim.originOffsetX, self.aim.originOffsetY)

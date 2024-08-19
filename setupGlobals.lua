@@ -2,6 +2,7 @@ local Scenery = require("libraries.scenery")
 
 local function setupGlobals()
     local g = {}
+    g.debug = true
     g.gameWidth, g.gameHeight = 320, 180
     g.currentTime = 0
     g.currentScene = "lunge"
