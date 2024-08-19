@@ -64,13 +64,14 @@ function game:CreateEnemies(size, enemyCount, enemyStartPosMultiplier)
     local Enemies = {}
     local enemiesSize = size
     local enemyStartPosMultiplier = enemyStartPosMultiplier
-    
+
     for num = 1, enemyCount do
         -- random enemy position
-        local ranx, rany = love.math.random(0,G.gameWidth) * enemyStartPosMultiplier, love.math.random(0,G.gameHeight) * enemyStartPosMultiplier
+        local ranx, rany = love.math.random(0, G.gameWidth) * enemyStartPosMultiplier,
+            love.math.random(0, G.gameHeight) * enemyStartPosMultiplier
 
         -- random negative
-        local neg = love.math.random(1,4)
+        local neg = love.math.random(1, 4)
         if neg == 1 then
             ranx = ranx * -1
         elseif neg == 2 then
@@ -150,9 +151,9 @@ function game:load(args)
     self.retryText.y = 500
     self.retryText.size = 50
 
-    self.Player = self:CreatePlayer(G.gameWidth/2, G.gameHeight/2, 10, 3) -- x, y, size, health
-    self.Aim = self:CreateAim(0.5, 20) -- scale, reticleDistance
-    self.Enemies = self:CreateEnemies(10, 10, 2) -- size, enemyCount, enemyStartPosMultiplier (recommend 2)
+    self.Player = self:CreatePlayer(G.gameWidth / 2, G.gameHeight / 2, 10, 3) -- x, y, size, health
+    self.Aim = self:CreateAim(0.5, 20)                                        -- scale, reticleDistance
+    self.Enemies = self:CreateEnemies(10, 10, 2)                              -- size, enemyCount, enemyStartPosMultiplier (recommend 2)
 
     self.inputManager = InputManager:getInstance()
 end
@@ -172,7 +173,7 @@ function game:update(dt)
         if self.inputManager:pressed("a") then
             self.Player.x = self.Player.x - 10
         end
-        
+
 
         -- aim angle
         local mx, my = self:getPlayerCenter()
@@ -201,9 +202,9 @@ function game:update(dt)
         local x, y = love.mouse.getPosition()
         if self.inputManager:pressed("leftMouse") then
             -- retry button
-            if x > self.retryText.x and x < self.retryText.x * self.retryText.size and 
+            if x > self.retryText.x and x < self.retryText.x * self.retryText.size and
                 y > self.retryText.y and y < self.retryText.y * self.retryText.size then
-                    self:load()
+                self:load()
             end
         end
     end
@@ -217,7 +218,7 @@ end
 
 function game:draw()
     -- self.aim reticle
-    love.graphics.draw(self.Aim.sprite, self.Aim.x, self.Aim.y, self.Aim.angle, self.Aim.scaleX, self.Aim.scaleY, 
+    love.graphics.draw(self.Aim.sprite, self.Aim.x, self.Aim.y, self.Aim.angle, self.Aim.scaleX, self.Aim.scaleY,
         self.Aim.originOffsetX, self.Aim.originOffsetY)
 
     -- player

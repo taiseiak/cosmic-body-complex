@@ -2,7 +2,7 @@ local Scenery = require("libraries.scenery")
 
 local function setupGlobals()
     local g = {}
-    g.gameWidth, g.gameHeight = 1280, 720
+    g.gameWidth, g.gameHeight = 320, 180
     g.currentTime = 0
     g.currentScene = "lunge"
     g.scenes = {}
@@ -14,7 +14,7 @@ local function setupGlobals()
     }
     -- This is the default scene.
     -- Change the string to change the default scene.
-    g.scenery = Scenery("testScene")
+    g.scenery = Scenery("mainMenu")
     return g
 end
 
