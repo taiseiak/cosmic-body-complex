@@ -1,12 +1,13 @@
 local Push = require("libraries.push")
 
-local setupGlobals = require("setupGlobals")
+require("constants")
+require("globals")
+
 local LoadText = require("loadText")
 
 local InputManager = require("input-manager")
 
 -- [Globals] --
-if setupGlobals then G = setupGlobals() end
 if LoadText then LoadText() end
 
 -- [Locals] --
@@ -15,6 +16,7 @@ local inputManager
 
 
 function love.load()
+    math.randomseed(os.time())
     love.graphics.setDefaultFilter('nearest', 'nearest')
     Push:setupScreen(G.gameWidth, G.gameHeight, 1280, 720,
         {
