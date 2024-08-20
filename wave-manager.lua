@@ -43,8 +43,7 @@ end
 
 function WaveManager:update(dt)
     local enemies = self:getEntities(C.entities.enemies)
-    if not enemies then return end
-    if #enemies < 1 and self.roundStarted then
+    if (not enemies or #enemies < 1) and self.roundStarted then
         self.roundStarted = false
     end
 end
